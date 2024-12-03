@@ -31,29 +31,56 @@ def main():
     try:
         #get calendar service
         service = build("calendar", "v3", credentials = creds)
-        now = dt.datetime.now().isoformat() + "Z"
 
-        events_result = (
-            service.events()
-            .list(
-                calendarId="primary",
-                timeMin = now,
-                maxResults=10,
-                singleEvents=True,
-                orderBy="startTime",
-           )
-            .execute()
-        )
-        events = events_result.get("items", [])
+        #add an event to the calendar----------------------------------------
+        event = {
+            "summary": "My python event",
+            "location": "Online",
+            "description": "details",
+            "colorId": 6,
+            "start":{
+                "dateTime": "2024-12-02T09:00:00+02:00",
+                "timeZone": "America/Chicago"
+            },
+            "end": {
+                "dateTime": "2024-12-02T12:00:00+02:00",
+                "timeZone": "America/Chicago"
+            },
+            "attendees":[
+                {"email": "hristtina99@gmail.com"}
+            ]
 
-        if not events:
-            print("No upcoming events found")
-            return
-        for event in events:
-            start = event["start"].get("dateTime", event["start"].get("date"))
-            print(start, event["summary"])
+        }
+        event = service.events().insert(calendarId="primary", body = event).execute()
+        print(f"Event created {event.get('htmlLink')}")
+
     except HttpError as error:
         print("An error occured: ", error)
 
+        # LIST 10 EVENTS --------------------------------------------------
+        # now = dt.datetime.now().isoformat() + "Z"
+        #
+        # events_result = (
+        #     service.events()
+        #     .list(
+        #         calendarId="primary",
+        #         timeMin = now,
+        #         maxResults=10,
+        #         singleEvents=True,
+        #         orderBy="startTime",
+        #    )
+        #     .execute()
+        # )
+        # events = events_result.get("items", [])
+        #
+        # if not events:
+        #     print("No upcoming events found")
+        #     return
+        # for event in events:
+        #     start = event["start"].get("dateTime", event["start"].get("date"))
+        #     print(start, event["summary"])
+        # LIST 10 EVENTS--------------------------------------------------------------
+
 if __name__ == "__main__":
     main()
+
