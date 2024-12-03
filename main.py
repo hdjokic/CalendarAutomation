@@ -8,7 +8,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-SCOPES = ["https://www/googleapis.com/auth/calendar"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
 
@@ -23,9 +23,37 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-            creds = flow.run_local_server(port = 0)
+            creds = flow.run_local_server(port=0)
         #save creds to token.json
         with open("token.json", "w") as token:
             token.write(creds.to_json())
 
+    try:
+        #get calendar service
+        service = build("calendar", "v3", credentials = creds)
+        now = dt.datetime.now().isoformat() + "Z"
 
+        events_result = (
+            service.events()
+            .list(
+                calendarId="primary",
+                timeMin = now,
+                maxResults=10,
+                singleEvents=True,
+                orderBy="startTime",
+           )
+            .execute()
+        )
+        events = events_result.get("items", [])
+
+        if not events:
+            print("No upcoming events found")
+            return
+        for event in events:
+            start = event["start"].get("dateTime", event["start"].get("date"))
+            print(start, event["summary"])
+    except HttpError as error:
+        print("An error occured: ", error)
+
+if __name__ == "__main__":
+    main()
