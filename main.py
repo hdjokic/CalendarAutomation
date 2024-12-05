@@ -27,6 +27,7 @@ def add_event_ics_file(event):
     first_attendee = Attendee(event['attendees']['email'])
     all_attendees = {first_attendee}
 
+
     e = Event()
 
     e.name = event['summary']
@@ -34,15 +35,21 @@ def add_event_ics_file(event):
     e.end = event['end']['dateTime']
     e.description = event['class category']
     e.attendees = all_attendees
-    e.dtstamp = event['dtstamp']
-    print('###################################################')
-    print(e.dtstamp)
+    print(type(e.attendees))
+    print(event['dtstamp'])
+    #e.extra = dt.date('Ymd', event['dtstamp'])
+    e.created = event['dtstamp']
+    print (e.created)
+
+    print('#####################')
+    #print(e.extra)
 
     ##Below only needed if attendees_with_email Attendee object is not in dictionary
     #e.attendees = {attendees_with_email}
 
 
     #print('events attendees_with_email: ' + str(e.attendees))
+    #createUrl(e)
     c.events.add(e)
 
 def main():
@@ -71,7 +78,8 @@ def main():
         result = sheets.values().get(spreadsheetId = SPREADSHEET_ID, range = "Sheet45!A2:ZZ").execute()
 
         values = result.get("values", [])
-        now = dt.datetime.now().isoformat() + "Z"
+        now = dt.datetime.now()
+
         for row in values:
             start_time, end_time = row[5].split('-')
             print(start_time)
@@ -87,8 +95,9 @@ def main():
                     'class category': row[1],
                     'start': {'dateTime': start_time.isoformat(), 'timeZone': 'America/Chicago'},
                     'end': {'dateTime': end_time.isoformat(), 'timeZone': 'America/Chicago'},
-                    'dtstamp': {'date': now},
-                    'attendees': {'email' : 'hristtina99@gmail.com'}
+                    'attendees': {'email' : 'hristtina99@gmail.com'},
+                    'dtstamp': now
+
                 }
                 print(event_data)
                 add_event_ics_file(event_data)
@@ -111,6 +120,17 @@ def main():
 
     except HttpError as error:
         print("An error occured: ", error)
+
+
+# def createUrl(e):
+#     timestamp =
+#     href = ("https://calendar.google.com/calendar/render?action=TEMPLATE")
+#
+#     dates ="&dates="+ timestamp
+#     20220112T180000Z%2F20220112T200000Z&details=Learn%20all%20about%20the%20rules%20of%20the%20Motorway%20and%20how%20to%20access%20the%20fast%20lane.%0A%0Ahttps%3A%2F%2Fen.wikipedia.org%2Fwiki%2FGridlock_%28Doctor_Who%29&location=New%20Earth&text=Welcome%20to%20the%20Motorway")
+#
+
+
 
 if __name__ == "__main__":
     main()
