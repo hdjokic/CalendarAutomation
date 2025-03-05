@@ -9,6 +9,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import mailer
+
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/calendar"]
 SPREADSHEET_ID = "1ndzqhxWEzciYuENn6DwitdF5ex_LJBdP4HdClSc2tNw"
 
@@ -49,7 +51,7 @@ def add_event_ics_file(event):
 
 
     #print('events attendees_with_email: ' + str(e.attendees))
-    #createUrl(e)
+    create_url(e)
     c.events.add(e)
 
 def main():
@@ -122,13 +124,32 @@ def main():
         print("An error occured: ", error)
 
 
-# def createUrl(e):
-#     timestamp =
-#     href = ("https://calendar.google.com/calendar/render?action=TEMPLATE")
-#
-#     dates ="&dates="+ timestamp
-#     20220112T180000Z%2F20220112T200000Z&details=Learn%20all%20about%20the%20rules%20of%20the%20Motorway%20and%20how%20to%20access%20the%20fast%20lane.%0A%0Ahttps%3A%2F%2Fen.wikipedia.org%2Fwiki%2FGridlock_%28Doctor_Who%29&location=New%20Earth&text=Welcome%20to%20the%20Motorway")
-#
+def create_url(e):
+    start = dt.datetime.now()
+    end = dt.datetime.now()
+
+    formatted_start = start.strftime("%Y%m%dT%H%M%S")
+    formatted_end = end.strftime("%Y%m%dT%H%M%S")
+
+    print("form start:"+formatted_start)
+
+    timestamp = str(formatted_start) + '%2F' + str(formatted_end)
+    print(timestamp)
+
+    detail_text = 'HiThisIsDetails'
+    text_text = 'HiThisIs%20Text'
+
+    href_start = ("https://calendar.google.com/calendar/render?action=TEMPLATE")
+    dates ="&dates="+ timestamp
+    details = "&details=" + detail_text
+    text="&text=" + text_text
+    full_url = href_start+dates+details+text
+    print(full_url)
+    mailer.send_email('hristtina99@gmail.com', "this is the url to add to cal: "+ full_url)
+
+
+    #20220112T180000Z%2F20220112T200000Z&details=Learn%20all%20about%20the%20rules%20of%20the%20Motorway%20and%20how%20to%20access%20the%20fast%20lane.%0A%0Ahttps%3A%2F%2Fen.wikipedia.org%2Fwiki%2FGridlock_%28Doctor_Who%29&location=New%20Earth&text=Welcome%20to%20the%20Motorway")
+
 
 
 
